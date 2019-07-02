@@ -1,3 +1,5 @@
+
+//connect to database
 var mysql = require("mysql");
 var inquirer = ("inquirer");
 var Table = require("cli-table2");
@@ -12,6 +14,8 @@ var connection = mysql.createConnection({
 
 connection.connect();
 
+
+//display on commandline 
 var display = function() {
   connection.query("SELECT * FROM products", function(err, res) {
       if (err) throw err;
@@ -35,7 +39,7 @@ var display = function() {
   });
 
   for (var i = 0; i < res.length; i++){
-      table.push([res[i].id, res[i].product_name, res[i].price]);
+      table.push([res[i].item_id, res[i].product_name, res[i].price]);
   }
 
   console.log(table.toString());
@@ -43,6 +47,34 @@ var display = function() {
 
 });
 
+};
+
+//prompting buyer to sell item 
+var shopping = function() {
+    inquirer
+        .prompt({
+            name: "productToBuy",
+            type: "input",
+            message: "Please enter the Product Id of the item you wish to purchase."
+        })
+        .then(function(answer1) {
+
+            var selection = answer1.productToBuy;
+            connection.query("SELECT * FROM products WHERE item_id=?", selection, function(
+                err, 
+                res) {
+
+                if (err) throw err;
+                if (res.length === 0) {
+                    console.log("That Product doesn't exist. Please eneter a Product Id from the list above.")
+                
+                shopping();
+                } else {
+                console.log("ok");
+            }
+        
+        });
+    });
 };
 
 display();
