@@ -29,8 +29,8 @@ var display = function() {
 
   var table = new Table({
 
-    head: ["Product Id", "Product Description", "Cost"],
-    colWidths: [12, 50, 8],
+    head: ["Product Id", "Product Description", "Department", "Cost"],
+    colWidths: [12, 30, 30, 8],
     colAligns: ["center", "left", "right"],
     style: {
         head: ["aqua"],
@@ -39,7 +39,7 @@ var display = function() {
   });
 
   for (var i = 0; i < res.length; i++){
-      table.push([res[i].item_id, res[i].product_name, res[i].price]);
+      table.push([res[i].item_id, res[i].product_name, res[i].department_name, res[i].price]);
   }
 
   console.log(table.toString());
@@ -51,8 +51,7 @@ var display = function() {
 
 //prompting buyer to sell item 
 var shopping = function() {
-    inquirer
-        .prompt({
+    inquirer.prompt({
             name: "productToBuy",
             type: "input",
             message: "Please enter the Product Id of the item you wish to purchase."
@@ -60,7 +59,7 @@ var shopping = function() {
         .then(function(answer1) {
 
             var selection = answer1.productToBuy;
-            connection.query("SELECT * FROM products WHERE item_id=?", selection, function(
+            connection.query("SELECT * FROM products WHERE item_id = ?", selection, function(
                 err, 
                 res) {
 
@@ -71,6 +70,35 @@ var shopping = function() {
                 shopping();
                 } else {
                 console.log("ok");
+                inquirer.prompt({
+                    name: "quantity",
+                    type: "input",
+                    message: "How many would you like to buy?"
+                }).then(function(answer2){
+
+                    var quantity = answer2.quantity;
+                    if (quantity > res[0].stock_quantity){
+                        console.log("Sorry, we only have" + res[0].stock_quantity + " items of the product selected")
+                        shopping();
+                    } else {
+                        console.log("");
+                        console.log(res[0].product_name + " purchased");
+                        console.log(quantity + " qty @ $" + res[0].price);
+
+                        //update stock quantity after purchase
+                        var newQuantity = res[0].stock_quantity - quantity;
+                        connection.query(
+                            "UPDATE products SET stock_quantity = " + newQuantity + "WHERE item_id = " + res[0].id, function(err, resUpdate) {
+                                if (err) throw err;
+                                console.log("");
+                                console.log("Your Order has been Processed");
+                                console.log("Thanks for shopping.");
+                                console.log("");
+                            }
+                        )
+                    }
+
+                })
             }
         
         });
@@ -78,3 +106,4 @@ var shopping = function() {
 };
 
 display();
+// shopping();
