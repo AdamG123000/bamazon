@@ -21,7 +21,7 @@ var display = function() {
       console.log("");
       console.log("Find your Procuct");
       console.log("");
-  });
+  
 
   var table = new Table({
 
@@ -41,5 +41,8 @@ var display = function() {
   console.log(table.toString());
   console.log("");
 
+});
+
 };
+
 display();
