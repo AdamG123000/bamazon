@@ -1,7 +1,7 @@
 
 //connect to database
 var mysql = require("mysql");
-var inquirer = ("inquirer");
+var inquirer = require("inquirer");
 var Table = require("cli-table2");
 
 var connection = mysql.createConnection({
@@ -47,6 +47,7 @@ var display = function() {
 
 });
 
+
 };
 
 //prompting buyer to sell item 
@@ -54,7 +55,10 @@ var shopping = function() {
     inquirer.prompt({
             name: "productToBuy",
             type: "input",
-            message: "Please enter the Product Id of the item you wish to purchase."
+            message: "Please enter the Product Id of the item you wish to purchase.",
+            choices: [
+                "make a choice"
+            ]
         })
         .then(function(answer1) {
 
@@ -81,14 +85,15 @@ var shopping = function() {
                         console.log("Sorry, we only have" + res[0].stock_quantity + " items of the product selected")
                         shopping();
                     } else {
-                        console.log("");
-                        console.log(res[0].product_name + " purchased");
-                        console.log(quantity + " qty @ $" + res[0].price);
+                        console.log('response 1',res[0].item_id);
+                        // console.log(res[0].product_name + " purchased");
+
+                        // console.log(quantity + " qty @ $" + res[0].price);
 
                         //update stock quantity after purchase
                         var newQuantity = res[0].stock_quantity - quantity;
                         connection.query(
-                            "UPDATE products SET stock_quantity = " + newQuantity + "WHERE item_id = " + res[0].id, function(err, resUpdate) {
+                            "UPDATE products SET stock_quantity = " + newQuantity + " WHERE item_id = " + res[0].item_id, function(err, resUpdate) {
                                 if (err) throw err;
                                 console.log("");
                                 console.log("Your Order has been Processed");
@@ -106,4 +111,4 @@ var shopping = function() {
 };
 
 display();
-// shopping();
+shopping();
